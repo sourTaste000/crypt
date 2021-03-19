@@ -1,0 +1,20 @@
+name: Crypt
+version: ${project.version}
+main: me.bigratenthusiast.crypt.Main
+api-version: 1.16
+authors: [ bigratenthusiast ]
+description: Helpful custom commands for the crypt and catacombs pvp minigame server
+website: chroma.bigrat.monster
+commands:
+  quickheal:
+    description: Heal and fully saturate a player
+    usage: quickheal [player]
+  deathmatch:
+    description: Initiate a deathmatch between all players in survival mode
+    usage: deathmatch
+  rematch:
+    description: Teleport everyone to spawn, clear them, and set them to survival
+    usage: rematch
+  killall:
+    description: Kills certain entities
+    usage: killall
