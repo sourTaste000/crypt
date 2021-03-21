@@ -1,7 +1,7 @@
 # Crypt Plugin
 
 
-[![Build Version](https://img.shields.io/badge/Version-1.0.0-yellow.svg)](https://github.com/bigratenthusiast/crypt) [![Lisence](https://img.shields.io/badge/lisence-MIT-brightgreen.svg)](https://github.com/bigratenthusiast/crypt/blob/main/LICENSE)
+[![Lisence](https://img.shields.io/badge/lisence-MIT-brightgreen.svg)](https://github.com/bigratenthusiast/crypt/blob/main/LICENSE)
 
 The crypt and catacombs pvp plugin
 
