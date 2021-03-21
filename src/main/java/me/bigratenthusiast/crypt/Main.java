@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityResurrectEvent;
@@ -36,11 +35,6 @@ public final class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         this.getServer().getPluginManager().registerEvents(this, this);
-    }
-
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -82,7 +76,8 @@ public final class Main extends JavaPlugin implements Listener {
                 return false;
             }
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=!minecraft:player,type=!minecraft:villager,type=!minecraft:painting,type=!minecraft:item_frame]");
-            getServer().getOnlinePlayers().forEach(this::playerClear);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect clear @e");
+            getServer().getOnlinePlayers().forEach(Utils::playerClear);
         } else if (label.equalsIgnoreCase("killall")) {
             if (!sender.isOp()) {
                 sender.sendMessage("You do not have permission to use this command.");
@@ -95,38 +90,29 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent playerDeathEvent) {
-        playerDeathEvent.getEntity().setGameMode(GameMode.SPECTATOR);
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        event.getEntity().setGameMode(GameMode.SPECTATOR);
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent playerMoveEvent) {
-        if (playerMoveEvent.getPlayer().getGameMode() == GameMode.SURVIVAL) {
-            if (playerMoveEvent.getPlayer().getLocation().getBlockY() > 240) {
-                playerMoveEvent.getPlayer().teleport(playerMoveEvent.getPlayer().getLocation().subtract(0, 2, 0));
-                playerMoveEvent.getPlayer().sendMessage("You cannot go any higher than this.");
-            } else if (playerMoveEvent.getPlayer().getLocation().getBlockY() < 60) {
-                Player player = playerMoveEvent.getPlayer();
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (event.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+            if (event.getPlayer().getLocation().getBlockY() > 240) {
+                event.getPlayer().teleport(event.getPlayer().getLocation().subtract(0, 2, 0));
+                event.getPlayer().sendMessage("You cannot go any higher than this.");
+            } else if (event.getPlayer().getLocation().getBlockY() < 60) {
+                Player player = event.getPlayer();
                 player.setFallDistance(0);
-                playerClear(player);
+                Utils.playerClear(player);
                 player.sendMessage("Whoops!");
             }
-            if (playerMoveEvent.getPlayer().hasPotionEffect(PotionEffectType.GLOWING)) {
-                playerMoveEvent.getPlayer().getWorld().spawnParticle(
-                        Particle.ENCHANTMENT_TABLE,
-                        playerMoveEvent.getPlayer().getLocation(),
-                        100
-                );
-            }
-
         }
     }
 
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onTotemPop(EntityResurrectEvent entityResurrectEvent) {
-        if (entityResurrectEvent.getEntityType() == EntityType.PLAYER && !entityResurrectEvent.isCancelled()) {
-            Player player = (Player) entityResurrectEvent.getEntity();
+    @EventHandler
+    public void onTotemPop(EntityResurrectEvent event) {
+        if (event.getEntityType() == EntityType.PLAYER && !event.isCancelled()) {
+            Player player = (Player) event.getEntity();
             ItemStack hollowTotem = new ItemStack(Material.FIREWORK_STAR);
             ItemMeta im = hollowTotem.getItemMeta();
             im.setDisplayName("§rHollow Totem");
@@ -154,10 +140,10 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onRightClick(PlayerInteractEvent playerInteractEvent) {
-        if (playerInteractEvent.getAction() == Action.RIGHT_CLICK_AIR && playerInteractEvent.getPlayer().isSneaking()) {
-            Player player = playerInteractEvent.getPlayer();
-            if (player.getInventory().getBoots().getItemMeta().getDisplayName().contains("Rush Boots")) {
+    public void onRightClick(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_AIR && event.getPlayer().isSneaking()) {
+            Player player = event.getPlayer();
+            if (player.getInventory().getBoots().getItemMeta().getDisplayName().contains("Rush Boots") && player.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
                 if (dashCooldowns.contains(player.getUniqueId())) {
                     player.sendMessage("You are on cooldown to use that ability.");
                 } else {
@@ -165,13 +151,11 @@ public final class Main extends JavaPlugin implements Listener {
                     player.playEffect(EntityEffect.BREAK_EQUIPMENT_CHESTPLATE);
                     this.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
                         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 120, 2, true, false));
-                        player.playEffect(EntityEffect.RAVAGER_STUNNED);
                     }, untilSlow);
                     dashCooldowns.add(player.getUniqueId());
                     this.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
                         dashCooldowns.remove(player.getUniqueId());
-                        player.sendMessage("Your cooldown is up.");
-                        player.playEffect(EntityEffect.FIREWORK_EXPLODE);
+                        player.sendMessage("You can now use that ability.");
                     }, dashCooldown);
                 }
 
@@ -179,13 +163,4 @@ public final class Main extends JavaPlugin implements Listener {
         }
     }
 
-    private void playerClear(Player player) {
-        player.getInventory().clear();
-        player.setGameMode(GameMode.SURVIVAL);
-        player.getActivePotionEffects().clear();
-        player.teleport(new Location(player.getWorld(), -127, 143, -369), PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT);
-        player.setFoodLevel(20);
-        player.setSaturation(20);
-        player.setHealth(20);
-    }
 }
