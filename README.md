@@ -28,7 +28,3 @@ Pull requests are welcome!
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
-
-## KOTLIN WHEN??
-make a pr. coward.
-![sus](https://i.imgur.com/oLcoPsw.png)
