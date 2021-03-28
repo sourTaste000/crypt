@@ -21,7 +21,7 @@ import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Consumer
 
-const val totemCoolDown: Long = 1200
+const val totemCoolDown: Long = 900
 const val dashCoolDown: Long = 620
 const val untilSlow: Long = 200
 val dashCoolDowns: CopyOnWriteArrayList<UUID> = CopyOnWriteArrayList()
@@ -111,7 +111,7 @@ class Main : JavaPlugin(), Listener, CommandExecutor {
             } else {
                 player.inventory.addItem(hollowTotem)
             }
-            player.sendMessage("Your totem will recharge in one minute.")
+            player.sendMessage("Your totem will recharge in forty-five seconds.")
             server.scheduler.scheduleSyncDelayedTask(this, {
                 if (player.gameMode == GameMode.SURVIVAL) {
                     player.sendMessage("Your totem is now recharged.")
@@ -133,7 +133,7 @@ class Main : JavaPlugin(), Listener, CommandExecutor {
             val player = event.player
             if (player.inventory.boots?.itemMeta?.displayName?.contains("Rush Boots") ?: kotlin.run { return } && player.inventory.itemInMainHand.type == Material.GOLDEN_AXE) {
                 if (dashCoolDowns.contains(player.uniqueId)) {
-                    player.sendMessage("You are on cool down to use that ability.")
+                    player.sendMessage("You are on cooldown to use that ability.")
                 } else {
                     player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 200, 4, true, false))
                     player.playEffect(EntityEffect.BREAK_EQUIPMENT_CHESTPLATE)
