@@ -2,7 +2,7 @@ name: Crypt
 version: ${project.version}
 main: me.bigratenthusiast.crypt.Main
 api-version: 1.16
-authors: [ bigratenthusiast ]
+authors: [bigratenthusiast, sourtaste]
 description: Helpful custom commands for the crypt and catacombs pvp minigame server
 website: chroma.bigrat.monster
 commands:
