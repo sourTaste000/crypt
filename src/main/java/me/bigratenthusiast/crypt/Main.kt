@@ -1,8 +1,8 @@
 package me.bigratenthusiast.crypt
 
 import org.bukkit.*
-import org.bukkit.attribute.Attribute
 import org.bukkit.command.Command
+import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -21,23 +21,22 @@ import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Consumer
 
-const val totemCoolDown: Long = 1200;
-const val dashCoolDown: Long = 620;
-const val untilSlow: Long = 200;
-val dashCoolDowns: CopyOnWriteArrayList<UUID> = CopyOnWriteArrayList();
+const val totemCoolDown: Long = 1200
+const val dashCoolDown: Long = 620
+const val untilSlow: Long = 200
+val dashCoolDowns: CopyOnWriteArrayList<UUID> = CopyOnWriteArrayList()
 
 
-class Main : JavaPlugin(), Listener {
+class Main : JavaPlugin(), Listener, CommandExecutor {
     override fun onEnable() {
         this.server.pluginManager.registerEvents(this, this)
     }
 
-    fun onCommand(sender: CommandSender, command: Command, label: String, args: List<String>): Boolean {
-        when (label.toLowerCase()){
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+        when (command.name.toLowerCase()){
             "quickheal" -> {
                 if (args[0].isEmpty()) {
-                    // TODO: Use color red for this message
-                    sender.sendMessage("ERROR: You must specify a player!")
+                    sender.sendMessage("${ChatColor.RED}ERROR: You must specify a player!")
                     return false
                 }
 
@@ -45,33 +44,39 @@ class Main : JavaPlugin(), Listener {
                     sender.sendMessage("There is no player by that name.")
                     return false
                 }
+
                 player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 100, 255))
                 player.addPotionEffect(PotionEffect(PotionEffectType.SATURATION, 100, 255))
-                // TODO: Use color pink
-                Bukkit.broadcastMessage("${sender.name} used quick heal on ${player.name}")
+                Bukkit.broadcastMessage("${ChatColor.LIGHT_PURPLE}${sender.name} used quick heal on ${player.name}")
+                return true
             }
 
             "deathmatch" -> {
-                // TODO: Use color red
-                Bukkit.broadcastMessage("Death match initiated by ${sender.name}")
+                Bukkit.broadcastMessage("${ChatColor.RED}Death match initiated by ${sender.name}")
                 server.onlinePlayers.forEach{player ->
                     if (player.gameMode == GameMode.SURVIVAL){
-                        server.dispatchCommand(server.consoleSender, "spreadplayers -65 83 -346 10 true @a[gamemode=survival]")
+                        server.dispatchCommand(server.consoleSender, "spreadplayers -65 -346 10 5 under 85 true @a[gamemode=survival]")
                     }
                 }
+                return true
             }
 
             "rematch" -> {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=!minecraft:player,type=!minecraft:villager,type=!minecraft:painting,type=!minecraft:item_frame]")
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect clear @e")
                 server.onlinePlayers.forEach{Utils.playerClear(it)}
+                return true
             }
 
             "killall" -> {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=!minecraft:player,type=!minecraft:villager,type=!minecraft:painting,type=!minecraft:item_frame]")
             }
+
+            else -> {
+                return false
+            }
         }
-        return false
+        return true
     }
 
     @EventHandler
@@ -83,14 +88,12 @@ class Main : JavaPlugin(), Listener {
         if (player.gameMode == GameMode.SURVIVAL) {
             if (player.location.blockY > 240) {
                 player.teleport(player.location.subtract(0.toDouble(), 2.toDouble(), 0.toDouble()))
-                // TODO: Use color red
-                player.sendMessage("You cannot go any higher than this!")
+                player.sendMessage("${ChatColor.RED}You cannot go any higher than this!")
             }
             if (player.location.blockY < 60) {
                 player.fallDistance = 0.toFloat()
-                Utils.playerClear(player);
-                //TODO: Use color yellow
-                player.sendMessage("Whoops!")
+                Utils.playerClear(player)
+                player.sendMessage("${ChatColor.YELLOW}Whoops!")
             }
         }
     }
