@@ -26,17 +26,6 @@ This plugin was made for a private server and alot of the features have to do wi
 ## Contributing
 Pull requests are welcome!
 
-## Todo
-
-### Bugs
- - rematch sometimes randomly causes a server error and idk why
-
-### Features
- - Add "Grappling Hook" item
- - Add "Ground Pound Boots" item
- - Custom weapons :)))
- - More Abilities
-
 ## Contributors List
  - bigrat enthusiast
  - sourtaste
