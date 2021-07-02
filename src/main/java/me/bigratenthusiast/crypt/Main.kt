@@ -83,6 +83,7 @@ class Main : JavaPlugin(), Listener, CommandExecutor {
                     Bukkit.getConsoleSender(),
                     "kill @e[type=!minecraft:player,type=!minecraft:villager,type=!minecraft:painting,type=!minecraft:item_frame]"
                 )
+                return true
             }
 
             else -> {
